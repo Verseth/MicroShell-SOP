@@ -12,3 +12,16 @@
 	<sys/wait.h>
 	<unistd.h>
 
+1579040999 source:/home/mateusz/Desktop/MicroShell SOP/microshell/main.c
+	<stdbool.h>
+	<dirent.h>
+	<errno.h>
+	<pwd.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<sys/types.h>
+	<sys/stat.h>
+	<sys/wait.h>
+	<unistd.h>
+
