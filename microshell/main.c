@@ -32,8 +32,11 @@ int main()
     register uid_t user_id;
     register struct passwd *user;
     char command_line[BUFFER];
+    char *tmp_str;
+    char args_s[20][BUFFER];
     char *args[20];
     char breaking_char[] = " ";
+    int quote_count, i;
 
     getcwd(current_dir, sizeof(current_dir));
     format_home_path();
@@ -45,16 +48,40 @@ int main()
         arg = 0;
         getcwd(current_dir, sizeof(current_dir));
 
-        printf("[%s%s%s: %s%s%s]\n", CYN_CLR, user_name, REG_CLR, GRN_CLR, current_dir, REG_CLR);
+        printf("[%s%s%s:%s%s%s]\n", CYN_CLR, user_name, REG_CLR, GRN_CLR, current_dir, REG_CLR);
         format_home_path();
-        printf("[%s%s%s: %s%s%s]", CYN_CLR, user_name, REG_CLR, GRN_CLR, formatted_current_dir, REG_CLR);
+        printf("[%s%s%s:%s%s%s]", CYN_CLR, user_name, REG_CLR, GRN_CLR, formatted_current_dir, REG_CLR);
         printf("$ ");
 
         fgets(command_line, sizeof(command_line), stdin);
         args[0] = strtok(command_line, breaking_char);
 
         while(true){
+            quote_count = 0;
             if(args[arg] == NULL) break;
+/*
+            for(i = 0; i < strlen(args[arg]); i++){
+                if(args[arg][i] == '\'')  quote_count++;
+            }
+            if(quote_count % 2 != 0){
+
+                tmp_str = strtok(NULL, "\'");
+                if(tmp_str == NULL) break;
+                strcat(args[arg], tmp_str);
+                strcat(args[arg], "'");
+
+                arg++;
+                args[arg] = strtok(NULL, " ");
+
+                if(args[arg] == NULL) break;
+
+                if((int)args[arg][0] == 47){
+                    strcat(args[arg-1], args[arg]);
+                    arg--;
+                }
+            }
+*/
+
             arg++;
             args[arg] = strtok(NULL, breaking_char);
         }
@@ -118,7 +145,13 @@ void format_home_path(){
     strcpy(formatted_current_dir, current_dir);
 
     if(strcmp(current_dir, home_path) == 0){
-        strcpy(formatted_current_dir, "/~");
+        strcpy(formatted_current_dir, "~");
+    }
+    else if(strcmp(current_dir, "/") == 0){
+        strcpy(formatted_current_dir, "/");
+    }
+    else if(strcmp(current_dir, "/home") == 0){
+        strcpy(formatted_current_dir, "/home");
     }
     else{
         tmp_path = strtok(current_dir_copy, "/");
