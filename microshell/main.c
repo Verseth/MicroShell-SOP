@@ -18,22 +18,22 @@
 int change_dir(char *target_path);
 void del_from_str(char *base_string, char *target_string, char first_del_char);
 void format_home_path();
-void parse_command(char **args);
+void parse_command();
 void display_help();
 
 char user_name[64];
 char last_path[BUFFER];
 char current_dir[BUFFER];
 char formatted_current_dir[BUFFER];
+char command_line[BUFFER];
+char args_s[20][BUFFER];
 int arg;
 
 int main()
 {
     register uid_t user_id;
     register struct passwd *user;
-    char command_line[BUFFER];
     char *tmp_str;
-    char args_s[20][BUFFER];
     char *args[20];
     char breaking_char[] = " ";
     int quote_count, i;
@@ -54,12 +54,13 @@ int main()
         printf("$ ");
 
         fgets(command_line, sizeof(command_line), stdin);
+/*
         args[0] = strtok(command_line, breaking_char);
 
         while(true){
             quote_count = 0;
             if(args[arg] == NULL) break;
-/*
+//
             for(i = 0; i < strlen(args[arg]); i++){
                 if(args[arg][i] == '\'')  quote_count++;
             }
@@ -80,13 +81,13 @@ int main()
                     arg--;
                 }
             }
-*/
+//
 
             arg++;
             args[arg] = strtok(NULL, breaking_char);
         }
-
-        parse_command(args);
+*/
+        parse_command();
 
 
         strcpy(last_path, current_dir);
@@ -95,29 +96,82 @@ int main()
     return 0;
 }
 
-void parse_command(char **args){
-    int i;
-    for(i = 0; i < arg; i++){
-        if((int)args[i][0] == 10){
-            arg--;
+void parse_command(){
+    int i = 0;
+    int curr_arg = 0;
+    int curr_char = 0;
+    bool word = false;
+    bool quotes = false;
+
+    while(i < strlen(command_line)){
+        if(quotes){
+            if(command_line[i] == '\''){
+                quotes = false;
+            }
+            else{
+                args_s[curr_arg][curr_char] = command_line[i];
+                curr_char++;
+            }
+        }
+        else if(command_line[i] == '\''){
+            quotes = true;
+            word = true;
+        }
+        else if(command_line[i] == ' ' || command_line[i] == '\n'){
+            if(word){
+                word = false;
+                args_s[curr_arg][curr_char] = '\0';
+                curr_arg++;
+                curr_char = 0;
+            }
+        }
+        else{
+            if(!word) word = true;
+            args_s[curr_arg][curr_char] = command_line[i];
+            curr_char++;
+        }
+
+        i++;
+    }
+
+    for(i = 0; i < curr_arg; i++){
+        if((int)args_s[i][0] == 10){
+            curr_arg--;
             break;
         }
     }
-    for(i = 0; i < strlen(args[arg-1]); i++){
-        if((int)args[arg-1][i] == 32 || (int)args[arg-1][i] == 10){
-            args[arg-1][i] = '\0';
+    for(i = 0; i < strlen(args_s[curr_arg]); i++){
+        if((int)args_s[curr_arg][i] == 32 || (int)args_s[curr_arg][i] == 10){
+            args_s[curr_arg][i] = '\0';
         }
     }
-
-    if(strcmp(args[0], "cd") == 0){
-        if(arg == 1) change_dir("~");
-        else if(change_dir(args[1]) != 0) printf("Directory doesn't exist!\n");
+    arg = curr_arg + 1;
+/*
+    for(i = 0; i <= curr_arg; i++){
+        printf("%s \n", args_s[i]);
+        for (int j = 0; j < strlen(args_s[i]); j++)
+        {
+            printf("%d ", args_s[i][j]);
+        }
+        printf("\n");
     }
-    else if(strcmp(args[0], "exit") == 0){
+
+    printf("%d \n", curr_arg);
+*/
+
+    if(quotes == true) printf("Improper syntax!\n");
+    else if(strcmp(args_s[0], "cd") == 0){
+        if(arg == 1) change_dir("~");
+        else if(change_dir(args_s[1]) != 0) printf("Directory doesn't exist!\n");
+    }
+    else if(strcmp(args_s[0], "exit") == 0){
         exit(0);
     }
-    else if(strcmp(args[0], "help") == 0){
+    else if(strcmp(args_s[0], "help") == 0){
         display_help();
+    }
+    else{
+        printf("Unknown command!\n");
     }
 }
 
