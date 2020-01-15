@@ -27,22 +27,22 @@ char current_dir[BUFFER];
 char formatted_current_dir[BUFFER];
 char command_line[BUFFER];
 char args_s[20][BUFFER];
+char history[BUFFER * 2];
 int arg;
 
 int main()
 {
+    char tmp_str[1024];
     register uid_t user_id;
     register struct passwd *user;
-    char *tmp_str;
-    char *args[20];
-    char breaking_char[] = " ";
-    int quote_count, i;
+    int i, history_breaker, tmp_id;
 
     getcwd(current_dir, sizeof(current_dir));
     format_home_path();
     user_id = geteuid();
     user = getpwuid(user_id);
     strcpy(user_name, user->pw_name);
+    strcpy(history, "");
 
     while(true){
         arg = 0;
@@ -54,39 +54,21 @@ int main()
         printf("$ ");
 
         fgets(command_line, sizeof(command_line), stdin);
-/*
-        args[0] = strtok(command_line, breaking_char);
+        if(strlen(history) > 3 * BUFFER / 2){
+            tmp_id = 0;
+            for(i = 0; i < strlen(history); i++)
+                if(history[i] == '\n' && i > BUFFER / 4) break;
+            history_breaker = i + 1;
 
-        while(true){
-            quote_count = 0;
-            if(args[arg] == NULL) break;
-//
-            for(i = 0; i < strlen(args[arg]); i++){
-                if(args[arg][i] == '\'')  quote_count++;
+            for(i = history_breaker; i <= strlen(history); i++){
+                tmp_str[tmp_id] = history[i];
+                tmp_id++;
             }
-            if(quote_count % 2 != 0){
 
-                tmp_str = strtok(NULL, "\'");
-                if(tmp_str == NULL) break;
-                strcat(args[arg], tmp_str);
-                strcat(args[arg], "'");
-
-                arg++;
-                args[arg] = strtok(NULL, " ");
-
-                if(args[arg] == NULL) break;
-
-                if((int)args[arg][0] == 47){
-                    strcat(args[arg-1], args[arg]);
-                    arg--;
-                }
-            }
-//
-
-            arg++;
-            args[arg] = strtok(NULL, breaking_char);
+            strcpy(history, tmp_str);
+            strcpy(tmp_str, "");
         }
-*/
+        strcat(history, command_line);
         parse_command();
 
 
@@ -169,6 +151,9 @@ void parse_command(){
     }
     else if(strcmp(args_s[0], "help") == 0){
         display_help();
+    }
+    else if(strcmp(args_s[0], "history") == 0){
+        printf(history);
     }
     else{
         printf("Unknown command!\n");
