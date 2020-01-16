@@ -11,13 +11,14 @@
 #include <unistd.h>
 
 #define BUFFER 512
-#define CYN_CLR "\e[0;36m"
-#define GRN_CLR "\e[0;32m"
+#define CYN_CLR "\e[1;36m"
+#define GRN_CLR "\e[1;32m"
 #define REG_CLR "\e[0;0m"
 
 int change_dir(char *target_path);
 void del_from_str(char *base_string, char *target_string, char first_del_char);
 void format_home_path();
+void execute_command();
 void parse_command();
 void display_help();
 void echo();
@@ -49,9 +50,8 @@ int main()
         arg = 0;
         getcwd(current_dir, sizeof(current_dir));
 
-        printf("[%s%s%s:%s%s%s]\n", CYN_CLR, user_name, REG_CLR, GRN_CLR, current_dir, REG_CLR);
         format_home_path();
-        printf("[%s%s%s:%s%s%s]", CYN_CLR, user_name, REG_CLR, GRN_CLR, formatted_current_dir, REG_CLR);
+        printf("%s%s%s:%s%s%s", CYN_CLR, user_name, REG_CLR, GRN_CLR, formatted_current_dir, REG_CLR);
         printf("$ ");
 
         fgets(command_line, sizeof(command_line), stdin);
@@ -155,14 +155,45 @@ void parse_command(){
         display_help();
     }
     else if(strcmp(args_s[0], "history") == 0){
-        printf(history);
+        printf("%s", history);
     }
     else if(strcmp(args_s[0], "echo") == 0){
         echo();
     }
     else{
-        printf("Unknown command!\n");
+        execute_command();
+        /* printf("Unknown command!\n"); */
     }
+}
+
+void execute_command(){
+    int i, fork_val;
+
+    char **arg_copy;
+    arg_copy = malloc((arg + 1) * sizeof(char *));
+    for(i = 0; i <= arg; i++)
+        arg_copy[i] = malloc(BUFFER * sizeof(char));
+
+
+    for(i = 0; i < arg; i++)
+        arg_copy[i] = args_s[i];
+    arg_copy[arg] = NULL;
+
+    fork_val = fork();
+
+    if(fork_val == -1){
+        printf("Unable to create a child process!\n");
+    }
+    else if(fork_val == 0){     /* Child process */
+        if(execvp(arg_copy[0], arg_copy) < 0)
+            printf("Program doesn't exist!\n");
+        exit(0);
+    }
+    else{                       /* Parent process */
+        wait(NULL);
+    }
+
+
 }
 
 void display_help(){
