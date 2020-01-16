@@ -5,14 +5,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/utsname.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
 #define BUFFER 512
 #define CYN_CLR "\e[1;36m"
 #define GRN_CLR "\e[1;32m"
+#define YLW_CLR "\e[1;33m"
+#define BLU_CLR "\e[1;34m"
 #define REG_CLR "\e[0;0m"
 
 int change_dir(char *target_path);
@@ -35,6 +38,7 @@ int arg;
 int main()
 {
     char tmp_str[1024];
+    struct utsname local_name;
     register uid_t user_id;
     register struct passwd *user;
     int i, history_breaker, tmp_id;
@@ -42,16 +46,18 @@ int main()
     getcwd(current_dir, sizeof(current_dir));
     format_home_path();
     user_id = geteuid();
+    uname(&local_name);
     user = getpwuid(user_id);
     strcpy(user_name, user->pw_name);
     strcpy(history, "");
+    printf("%sWelcome to %s***%sMatiShell%s***%s\n", CYN_CLR, GRN_CLR, YLW_CLR, GRN_CLR, REG_CLR);
 
     while(true){
         arg = 0;
         getcwd(current_dir, sizeof(current_dir));
 
         format_home_path();
-        printf("%s%s%s:%s%s%s", CYN_CLR, user_name, REG_CLR, GRN_CLR, formatted_current_dir, REG_CLR);
+        printf("%s%s@%s%s:%s%s%s", CYN_CLR, user_name, local_name.nodename, REG_CLR, GRN_CLR, formatted_current_dir, REG_CLR);
         printf("$ ");
 
         fgets(command_line, sizeof(command_line), stdin);
@@ -85,6 +91,7 @@ void parse_command(){
     int curr_char = 0;
     bool word = false;
     bool quotes = false;
+    bool double_quotes = false;
 
     while(i < strlen(command_line)){
         if(quotes){
@@ -96,8 +103,21 @@ void parse_command(){
                 curr_char++;
             }
         }
+        else if(double_quotes){
+            if(command_line[i] == '\"'){
+                double_quotes = false;
+            }
+            else{
+                args_s[curr_arg][curr_char] = command_line[i];
+                curr_char++;
+            }
+        }
         else if(command_line[i] == '\''){
             quotes = true;
+            word = true;
+        }
+        else if(command_line[i] == '\"'){
+            double_quotes = true;
             word = true;
         }
         else if(command_line[i] == ' ' || command_line[i] == '\n'){
@@ -142,7 +162,7 @@ void parse_command(){
     printf("%d \n", curr_arg);
 */
 
-    if(quotes == true) printf("Improper syntax!\n");
+    if(quotes || double_quotes) printf("Improper syntax!\n");
     else if(strcmp(args_s[0], "cd") == 0){
         if(arg == 1) change_dir("~");
         else if(arg > 2) printf("Too many arguments!\n");
@@ -186,7 +206,7 @@ void execute_command(){
     }
     else if(fork_val == 0){     /* Child process */
         if(execvp(arg_copy[0], arg_copy) < 0)
-            printf("Program doesn't exist!\n");
+            printf("Unknown command!\n");
         exit(0);
     }
     else{                       /* Parent process */

@@ -12,7 +12,7 @@
 	<sys/wait.h>
 	<unistd.h>
 
-1579209028 source:/home/mateusz/Desktop/MicroShell SOP/microshell/main.c
+1579210736 source:/home/mateusz/Desktop/MicroShell SOP/microshell/main.c
 	<stdbool.h>
 	<dirent.h>
 	<errno.h>
@@ -20,8 +20,9 @@
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
-	<sys/types.h>
 	<sys/stat.h>
+	<sys/types.h>
+	<sys/utsname.h>
 	<sys/wait.h>
 	<unistd.h>
 
