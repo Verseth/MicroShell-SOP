@@ -20,6 +20,7 @@ void del_from_str(char *base_string, char *target_string, char first_del_char);
 void format_home_path();
 void parse_command();
 void display_help();
+void echo();
 
 char user_name[64];
 char last_path[BUFFER];
@@ -127,9 +128,9 @@ void parse_command(){
             args_s[curr_arg][i] = '\0';
         }
     }
-    arg = curr_arg + 1;
+    arg = curr_arg;
 /*
-    for(i = 0; i <= curr_arg; i++){
+    for(i = 0; i < curr_arg; i++){
         printf("%s \n", args_s[i]);
         for (int j = 0; j < strlen(args_s[i]); j++)
         {
@@ -144,6 +145,7 @@ void parse_command(){
     if(quotes == true) printf("Improper syntax!\n");
     else if(strcmp(args_s[0], "cd") == 0){
         if(arg == 1) change_dir("~");
+        else if(arg > 2) printf("Too many arguments!\n");
         else if(change_dir(args_s[1]) != 0) printf("Directory doesn't exist!\n");
     }
     else if(strcmp(args_s[0], "exit") == 0){
@@ -154,6 +156,9 @@ void parse_command(){
     }
     else if(strcmp(args_s[0], "history") == 0){
         printf(history);
+    }
+    else if(strcmp(args_s[0], "echo") == 0){
+        echo();
     }
     else{
         printf("Unknown command!\n");
@@ -167,9 +172,18 @@ void display_help(){
     printf("* `cd` command - changes the working directory\n");
     printf("* `help` command - displays this help message\n");
     printf("* `exit` command - exits the programme\n");
+    printf("* `history` command - prints this message and automatically deletes old entries\n");
+    printf("* `echo` command - prints all the passed arguments\n");
     printf("* other commands - try typing in other commands known from regular terminals,\n");
     printf("  this programme will attempt to find them using the PATH environment variable\n");
     printf("  and execute them for you\n");
+}
+
+void echo(){
+    int i;
+    for(i = 1; i < arg; i++)
+        printf("%s ", args_s[i]);
+    printf("\n");
 }
 
 void format_home_path(){
