@@ -238,12 +238,14 @@ void echo(){
 }
 
 void format_home_path(){
+    int i, j, new_path_length = 0;
     char *tmp_path;
+    char *tmp_str;
     char current_dir_copy[BUFFER];
     char home_path[BUFFER];
+    bool home_dir = false;
 
-    strcpy(home_path, "/home/");
-    strcat(home_path, user_name);
+    strcpy(home_path, tmp_str);
 
     strcpy(current_dir_copy, current_dir);
     strcpy(formatted_current_dir, current_dir);
@@ -258,6 +260,30 @@ void format_home_path(){
         strcpy(formatted_current_dir, "/home");
     }
     else{
+/* */
+        for(i = 0; i < strlen(current_dir); i++){
+            current_dir_copy[i] = '\0';
+            if(strcmp(current_dir_copy, home_path) == 0){
+                home_dir = true;
+                break;
+            }
+            current_dir_copy[i] = current_dir[i];
+        }
+
+        if(home_dir){
+            new_path_length = strlen(current_dir) - strlen(current_dir_copy) + 1;
+            strcpy(current_dir_copy, "~");
+            for(j = 1; j < new_path_length; j++){
+                current_dir_copy[j] = current_dir[i];
+                i++;
+            }
+            current_dir_copy[j] = '\0';
+            strcpy(formatted_current_dir, current_dir_copy);
+        }
+/* */
+
+        /* YE OLDE WAY */
+/*
         tmp_path = strtok(current_dir_copy, "/");
 
         if(strcmp(tmp_path, "home") == 0){
@@ -269,6 +295,7 @@ void format_home_path(){
                 strcat(formatted_current_dir, tmp_path);
             }
         }
+*/
     }
 }
 
