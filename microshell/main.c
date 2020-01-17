@@ -245,6 +245,7 @@ void format_home_path(){
     char home_path[BUFFER];
     bool home_dir = false;
 
+    tmp_str = getenv("HOME");
     strcpy(home_path, tmp_str);
 
     strcpy(current_dir_copy, current_dir);
@@ -260,7 +261,6 @@ void format_home_path(){
         strcpy(formatted_current_dir, "/home");
     }
     else{
-/* */
         for(i = 0; i < strlen(current_dir); i++){
             current_dir_copy[i] = '\0';
             if(strcmp(current_dir_copy, home_path) == 0){
@@ -280,22 +280,6 @@ void format_home_path(){
             current_dir_copy[j] = '\0';
             strcpy(formatted_current_dir, current_dir_copy);
         }
-/* */
-
-        /* YE OLDE WAY */
-/*
-        tmp_path = strtok(current_dir_copy, "/");
-
-        if(strcmp(tmp_path, "home") == 0){
-            tmp_path = strtok(NULL, "/");
-
-            if(strcmp(tmp_path, user_name) == 0){
-                tmp_path = strtok(NULL, "");
-                strcpy(formatted_current_dir, "~/");
-                strcat(formatted_current_dir, tmp_path);
-            }
-        }
-*/
     }
 }
 
