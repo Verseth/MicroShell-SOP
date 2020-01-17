@@ -285,11 +285,12 @@ void del_from_str(char *target_string, char *base_string, char first_del_char){
 
 int change_dir(char *target_path){
     char *parsed_path = (char *)malloc(BUFFER * sizeof(char));
+    char *tmp_str;
     int ret_val = 0;
 
     if(strcmp(target_path, "~") == 0){
-        strcpy(parsed_path, "/home/");
-        strcat(parsed_path, user_name);
+        tmp_str = getenv("HOME");
+        strcpy(parsed_path, tmp_str);
     }
     else if(strcmp(target_path, "..") == 0){
         del_from_str(parsed_path, current_dir, '/');
