@@ -5,7 +5,7 @@ MatiShell
 ---------
 A simple C programme meant to emulate a standard BASH Shell.
 
-Programmed as an university project.
+Programmed as a university project.
 
 Has a few quirks and features:
 *  a `help` command which displays a simple overview of its features
