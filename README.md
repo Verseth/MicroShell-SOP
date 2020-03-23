@@ -1,5 +1,6 @@
 MicroShell SOP
 ==============
+<img src="./img/logo.png" alt="MatiShell Logo">
 
 MatiShell
 ---------
@@ -7,7 +8,6 @@ A simple C programme meant to emulate a standard BASH Shell.
 WARNING: It is prepared to run correclty only on Linux
 
 Programmed as a university project.
-
 Has a few quirks and features:
 *  a `help` command which displays a simple overview of its features
 *  the `cd` command which was fully implemented by me
