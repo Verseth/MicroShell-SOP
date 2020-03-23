@@ -23,3 +23,7 @@ To properly configure and run this programme:
 * enter the `microshell` directory
 * compile the programme with this command `$ gcc -ansi -Wall -o MatiShell main.c`
 * now you can run it with `$ ./MatiShell`
+
+Images
+-------
+<img style="width: 200px;" src="./img/MatiShell.png" alt="MatiShell">
