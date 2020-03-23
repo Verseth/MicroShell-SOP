@@ -22,4 +22,4 @@ To properly configure and run this programme:
 * navigate to this repo on your local machine (using a terminal)
 * enter the `microshell` directory
 * compile the programme with this command `$ gcc -ansi -Wall -o MatiShell main.c`
-* now you can run it with `./MatiShell`
+* now you can run it with `$ ./MatiShell`
